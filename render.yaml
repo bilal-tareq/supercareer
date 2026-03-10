@@ -1,0 +1,27 @@
+# Render auto-deploy configuration
+# Update the values below to match your project & service.
+
+services:
+  - type: web
+    name: supercareer
+    env: python
+    plan: starter
+    region: oregon
+
+    # NOTE: Render sets DATABASE_URL automatically if you attach a Postgres instance.
+    #       You can also add other env vars in the Render dashboard.
+
+    buildCommand: |
+      pip install -r requirements.txt
+      python manage.py collectstatic --noinput
+
+    startCommand: gunicorn supercareer.wsgi:application --log-file -
+
+    envVars:
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: "your-app.onrender.com"
+      # - key: DJANGO_SECRET_KEY
+      #   value: "replace-with-your-secret"
+      # NOTE: For sensitive vars (SECRET_KEY), set them in the Render dashboard instead of committing them.
