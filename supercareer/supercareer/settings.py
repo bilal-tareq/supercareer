@@ -15,8 +15,6 @@ from datetime import timedelta
 import ssl
 import os
 
-import dj_database_url
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,16 +23,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Use an environment variable in production (set on Render, Heroku, etc.)
-SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-%4c9^7&gt!=sf=u5z==9_&3(z3%rmgpdvwl_hc!a=#t$-*i+5#',
-)
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-%4c9^7&gt!=sf=u5z==9_&3(z3%rmgpdvwl_hc!a=#t$-*i+5#')
+
+# Google OAuth2
+# Make sure this matches your OAuth client ID from Google Cloud (or set as an env var).
+GOOGLE_CLIENT_ID = os.environ.get('GOOGLE_CLIENT_ID', '21573543621-sgq0sjo7lub3hu3btsksflj7ujolhoki.apps.googleusercontent.com')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DJANGO_DEBUG', 'True') == 'True'
+DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-# In Render, set DJANGO_ALLOWED_HOSTS to your domain (comma-separated). Defaults to localhost for local dev.
+# Allowed hosts (add your Render/Railway host names here)
 ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', 'localhost').split(',')
 
 
@@ -135,13 +133,25 @@ WSGI_APPLICATION = 'supercareer.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL', 'postgres://postgres:2005@localhost:5432/carrer'),
-        conn_max_age=600,
-        ssl_require=not DEBUG,
-    )
-}
+# Database configuration (works with Render/Heroku via DATABASE_URL)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    import dj_database_url
+
+    DATABASES = {
+        'default': dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'carrer',
+            'USER': 'postgres',
+            'PASSWORD': '2005',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 
 
 
@@ -180,9 +190,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Enable WhiteNoise to serve static files efficiently in production
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
@@ -196,12 +204,12 @@ CORS_ALLOW_CREDENTIALS = True
 
 # Email settings for development
 # Email configuration
-EMAIL_HOST = os.environ.get('EMAIL_HOST', 'smtp.gmail.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'bilaltarek2005@gmail.com'
+EMAIL_HOST_PASSWORD = 'sznp foio icdk yuey'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 # SSL and Backend Fix for Development
 if DEBUG:

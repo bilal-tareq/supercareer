@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from accounts.views import RegisterView, ProfileView, CustomTokenObtainPairView, LogoutView
+from accounts.views import RegisterView, ProfileView, CustomTokenObtainPairView, LogoutView, GoogleAuthView
 from notifications.views import ForgotPasswordView, VerifyOTPView, ResetPasswordView
 from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -26,6 +26,7 @@ urlpatterns = [
     
     path('api/register/', RegisterView.as_view()),
     path('api/login/', CustomTokenObtainPairView.as_view()),
+    path('api/auth/google/', GoogleAuthView.as_view()),
     path('api/logout/', LogoutView.as_view()),
     path('api/token/refresh/', TokenRefreshView.as_view()),
 
